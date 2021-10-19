@@ -1,6 +1,6 @@
 1. Шаблоны:
 
-Импортировать Zabbix 5.0-5 (1).2 NetPing Universal Template.xml
+Импортировать Zabbix_5.0-5.2.xml 
 API Импорт (применимо и далее): https://www.zabbix.com/documentation/current/ru/manual/api/reference/configuration/import
 
 2. Мониторинг самого сервера + температура + внутренний нетпинг
