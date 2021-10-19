@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-10-19T18:00:36Z</date>
+    <groups>
+        <group>
+            <name>NetPing</name>
+        </group>
+    </groups>
+    <hosts>
+        <host>
+            <host>Internal_NetPing</host>
+            <name>Internal_NetPing</name>
+            <description>Internal NetPing 4PWR-220</description>
+            <groups>
+                <group>
+                    <name>NetPing</name>
+                </group>
+            </groups>
+            <interfaces>
+                <interface>
+                    <type>SNMP</type>
+                    <ip>192.168.88.101</ip>
+                    <port>161</port>
+                    <details>
+                        <version>SNMPV1</version>
+                        <community>SWITCH</community>
+                    </details>
+                    <interface_ref>if1</interface_ref>
+                </interface>
+            </interfaces>
+            <applications>
+                <application>
+                    <name>GSM</name>
+                </application>
+                <application>
+                    <name>Humidity</name>
+                </application>
+                <application>
+                    <name>IO Lines</name>
+                </application>
+                <application>
+                    <name>Power Quality</name>
+                </application>
+                <application>
+                    <name>Relay</name>
+                </application>
+                <application>
+                    <name>Temperature</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>GSM Registratios</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>.1.3.6.1.4.1.25728.3800.1.2</snmp_oid>
+                    <key>GSMReg</key>
+                    <applications>
+                        <application>
+                            <name>GSM</name>
+                        </application>
+                    </applications>
+                    <interface_ref>if1</interface_ref>
+                </item>
+                <item>
+                    <name>GSM Status</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>.1.3.6.1.4.1.25728.3800.1.1</snmp_oid>
+                    <key>GSMStatus</key>
+                    <applications>
+                        <application>
+                            <name>GSM</name>
+                        </application>
+                    </applications>
+                    <interface_ref>if1</interface_ref>
+                </item>
+                <item>
+                    <name>GSM Strength</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>.1.3.6.1.4.1.25728.3800.1.3</snmp_oid>
+                    <key>GSMStr</key>
+                    <applications>
+                        <application>
+                            <name>GSM</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>IN_RANGE</type>
+                            <params>0
+31</params>
+                            <error_handler>CUSTOM_ERROR</error_handler>
+                            <error_handler_params>GSM Strength N/A</error_handler_params>
+                        </step>
+                        <step>
+                            <type>JAVASCRIPT</type>
+                            <params>if (value &lt;= 31 &amp;&amp; value &gt; 0) {return Math.round(100 / 31 * value)}
+else {return 0}</params>
+                        </step>
+                    </preprocessing>
+                    <interface_ref>if1</interface_ref>
+                </item>
+            </items>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>Humidity Sensors Discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#H_MEMO}, .1.3.6.1.4.1.25728.8400.1.1.6]</snmp_oid>
+                    <key>HumiditySensorsHSDiscovery</key>
+                    <interface_ref>if1</interface_ref>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Humidity Sensor {#SNMPINDEX} High ({#H_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8400.1.1.7.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelHumSafeRangeHigh[{#SNMPINDEX}]</key>
+                            <delay>23h</delay>
+                            <units>%</units>
+                            <applications>
+                                <application>
+                                    <name>Humidity</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Humidity Sensor {#SNMPINDEX} Low ({#H_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8400.1.1.8.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelHumSafeRangeLow[{#SNMPINDEX}]</key>
+                            <delay>23h</delay>
+                            <units>%</units>
+                            <applications>
+                                <application>
+                                    <name>Humidity</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Humidity Sensor {#SNMPINDEX} Status ({#H_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8400.1.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelHumStatus[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Humidity</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Humidity Sensor {#SNMPINDEX} Temp High ({#H_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8400.1.1.9.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelHumTempSafeRangeHigh[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Humidity</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Humidity Sensor {#SNMPINDEX} Temp Low ({#H_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8400.1.1.10.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelHumTempSafeRangeLow[{#SNMPINDEX}]</key>
+                            <delay>23h</delay>
+                            <units>°C</units>
+                            <applications>
+                                <application>
+                                    <name>Humidity</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Humidity Sensor {#SNMPINDEX} Temp Status ({#H_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8400.1.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelHumTempStatus[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Humidity</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Humidity Sensor {#SNMPINDEX} Temperature ({#H_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8400.1.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelHumTempValue[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Humidity</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Humidity Sensor {#SNMPINDEX} Value ({#H_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8400.1.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelHumValue[{#SNMPINDEX}]</key>
+                            <units>%</units>
+                            <applications>
+                                <application>
+                                    <name>Humidity</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Internal IO</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#IO_MEMO}, .1.3.6.1.4.1.25728.8900.1.1.6]</snmp_oid>
+                    <key>InternalIOSensorsDiscovery</key>
+                    <delay>10s</delay>
+                    <description>Internal IO lines from Discovery</description>
+                    <interface_ref>if1</interface_ref>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>IO Sensor {#SNMPINDEX} Input Level ({#IO_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8900.1.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>npIoLevelIn[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>IO Lines</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>IN_RANGE</type>
+                                    <params>0
+1</params>
+                                </step>
+                            </preprocessing>
+                            <interface_ref>if1</interface_ref>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=0</expression>
+                                    <name>{HOST.NAME} - IO Line {#SNMPINDEX} ({#IO_MEMO}) Status: Log. 0</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=1</expression>
+                                    <name>{HOST.NAME} - IO Line {#SNMPINDEX} ({#IO_MEMO}) Status: Log. 1</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>IO Sensor {#SNMPINDEX} Pulse Counter ({#IO_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8900.1.1.9.{#SNMPINDEX}</snmp_oid>
+                            <key>npIoPulseCounter[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>IO Lines</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>IO {#SNMPINDEX} ({#IO_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <calc_fnc>ALL</calc_fnc>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npIoLevelIn[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Power quality Sensor Discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#V_MEMO}, .1.3.6.1.4.1.25728.9000.1.1.6]</snmp_oid>
+                    <key>pwrq</key>
+                    <interface_ref>if1</interface_ref>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Voltage Sensor {#SNMPINDEX} Frequency status ({#V_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.9000.1.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>npVoltageFreqStatus[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Power Quality</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>{HOST.NAME} - Voltage Sensor {#SNMPINDEX} ({#V_MEMO}) Frequency status: bad</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=3</expression>
+                                    <name>{HOST.NAME} - Voltage Sensor {#SNMPINDEX} ({#V_MEMO}) Frequency status: warn</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Voltage Sensor {#SNMPINDEX} Frequency ({#V_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.9000.1.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>npVoltageFreq[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Power Quality</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>IN_RANGE</type>
+                                    <params>0
+10000</params>
+                                </step>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>0.01</params>
+                                </step>
+                            </preprocessing>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Voltage Sensor {#SNMPINDEX} Peak status ({#V_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.9000.1.1.31.{#SNMPINDEX}</snmp_oid>
+                            <key>npVoltagePeakStatus[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Power Quality</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>{HOST.NAME} - Voltage Sensor {#SNMPINDEX} ({#V_MEMO}) Peak status: dangerous</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Voltage Sensor {#SNMPINDEX} Peak voltage ({#V_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.9000.1.1.30.{#SNMPINDEX}</snmp_oid>
+                            <key>npVoltagePeak[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Power Quality</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Voltage Sensor {#SNMPINDEX} RMS ({#V_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.9000.1.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>npVoltageRMS[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Power Quality</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Voltage Sensor {#SNMPINDEX} Sags counter ({#V_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.9000.1.1.10.{#SNMPINDEX}</snmp_oid>
+                            <key>npVoltageSagCounter[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Power Quality</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Voltage Sensor {#SNMPINDEX} Sags status ({#V_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.9000.1.1.11.{#SNMPINDEX}</snmp_oid>
+                            <key>npVoltageSagStatus[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Power Quality</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Voltage Sensor {#SNMPINDEX} Nominal voltage ({#V_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.9000.1.1.20.{#SNMPINDEX}</snmp_oid>
+                            <key>npVoltageStandard[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Power Quality</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Voltage Sensor {#SNMPINDEX} RMS Status ({#V_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.9000.1.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>npVoltageStatus[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Power Quality</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=1</expression>
+                                    <name>{HOST.NAME} - Voltage Sensor {#SNMPINDEX} ({#V_MEMO}) status: no voltage</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=0</expression>
+                                    <name>{HOST.NAME} - Voltage Sensor {#SNMPINDEX} ({#V_MEMO}) Status: sensor failed</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>{HOST.NAME} - Voltage Sensor {#SNMPINDEX} ({#V_MEMO}) Voltage status: bad</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=3</expression>
+                                    <name>{HOST.NAME} - Voltage Sensor {#SNMPINDEX} ({#V_MEMO}) Voltage status: warn</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>Voltage Sensor {#SNMPINDEX} Frequency ({#V_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npVoltageFreq[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>Voltage Sensor {#SNMPINDEX} RMS ({#V_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npVoltageRMS[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <drawtype>DASHED_LINE</drawtype>
+                                    <color>F63100</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npVoltageStandard[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Relay Discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#R_MEMO}, .1.3.6.1.4.1.25728.5500.5.1.6]</snmp_oid>
+                    <key>RelayDiscovery</key>
+                    <interface_ref>if1</interface_ref>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Relay {#SNMPINDEX} Mode ({#R_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.5500.5.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelayMode[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Relay</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Relay {#SNMPINDEX} State ({#R_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.5500.5.1.15.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelayState[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Relay</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=0</expression>
+                                    <name>{HOST.NAME} - Relay {#SNMPINDEX} ({#R_MEMO}) Status: off</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=1</expression>
+                                    <name>{HOST.NAME} - Relay {#SNMPINDEX} ({#R_MEMO}) Status: on</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>Relay {#SNMPINDEX} State ({#R_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npRelayState[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Temperature Sensors Discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#T_MEMO}, .1.3.6.1.4.1.25728.8800.1.1.6]</snmp_oid>
+                    <key>TemperatureSensorsDiscovery</key>
+                    <interface_ref>if1</interface_ref>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Temperature Sensor {#SNMPINDEX} High ({#T_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8800.1.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>npThermoHigh[{#SNMPINDEX}]</key>
+                            <delay>23h</delay>
+                            <units>°C</units>
+                            <applications>
+                                <application>
+                                    <name>Temperature</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Temperature Sensor {#SNMPINDEX} Low ({#T_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8800.1.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>npThermoLow[{#SNMPINDEX}]</key>
+                            <delay>23h</delay>
+                            <units>°C</units>
+                            <applications>
+                                <application>
+                                    <name>Temperature</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Temperature Sensor {#SNMPINDEX} Status ({#T_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8800.1.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>npThermoStatus[{#SNMPINDEX}]</key>
+                            <applications>
+                                <application>
+                                    <name>Temperature</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=3</expression>
+                                    <name>{HOST.NAME} - Temperature Sensor {#SNMPINDEX} ({#T_MEMO}) Status: ABOVE SAFE RANGE</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=1</expression>
+                                    <name>{HOST.NAME} - Temperature Sensor {#SNMPINDEX} ({#T_MEMO}) Status: BELOW SAFE RANGE</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=0</expression>
+                                    <name>{Template_NetPing:npThermoStatus[{#SNMPINDEX}].last()}=0</name>
+                                    <priority>DISASTER</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Temperature Sensor {#SNMPINDEX} Value ({#T_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8800.1.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>npThermoValue[{#SNMPINDEX}]</key>
+                            <value_type>FLOAT</value_type>
+                            <units>°C</units>
+                            <applications>
+                                <application>
+                                    <name>Temperature</name>
+                                </application>
+                            </applications>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>Temperature Sensor {#SNMPINDEX}: {#T_MEMO}</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npThermoValue[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <drawtype>DASHED_LINE</drawtype>
+                                    <color>F63100</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npThermoHigh[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>3</sortorder>
+                                    <drawtype>DASHED_LINE</drawtype>
+                                    <color>2774A4</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npThermoLow[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+            </discovery_rules>
+            <inventory_mode>DISABLED</inventory_mode>
+        </host>
+    </hosts>
+</zabbix_export>
