@@ -1,8 +1,1 @@
-Package: ubnt-zabbix-template
-Version: 0.1
-Maintainer: vv.lisyak@gmail.com
-Architecture: all
-Section: misc
-Description: NetPing
- First deb build.
- Try nomber one.
+
