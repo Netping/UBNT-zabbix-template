@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>5.0</version>
-    <date>2021-10-19T17:44:42Z</date>
+    <version>6.0</version>
+    <date>2024-02-26T01:33:34Z</date>
     <groups>
         <group>
+            <uuid>6f6799aa69e844b4b3918f779f2abf08</uuid>
             <name>Zabbix servers</name>
         </group>
     </groups>
@@ -34,23 +35,25 @@
                     <name>CPU Temp</name>
                     <key>dkst90.cpuTemperature</key>
                     <units>C</units>
-                    <applications>
-                        <application>
-                            <name>CPU</name>
-                        </application>
-                    </applications>
                     <interface_ref>if1</interface_ref>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>CPU</value>
+                        </tag>
+                    </tags>
                 </item>
                 <item>
                     <name>MotherBoaord Temp</name>
                     <key>dkst90.mbTemperature</key>
                     <units>C</units>
-                    <applications>
-                        <application>
-                            <name>CPU</name>
-                        </application>
-                    </applications>
                     <interface_ref>if1</interface_ref>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>CPU</value>
+                        </tag>
+                    </tags>
                 </item>
             </items>
             <inventory_mode>DISABLED</inventory_mode>

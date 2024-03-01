@@ -1,0 +1,13 @@
+#!/usr/bin/make -f
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+export DH_OPTIONS=-v
+
+DESTDIR=debian/ubnt-zabbix-template
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	mkdir -p $(DESTDIR)
+	cp -r tmp/ $(DESTDIR)

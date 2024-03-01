@@ -1,0 +1,66 @@
+#! /bin/bash
+#
+
+function cfg_import() {
+    json="{
+              \"jsonrpc\": \"2.0\",
+              \"method\": \"configuration.import\",
+              \"params\": {
+                  \"format\": \"xml\",
+                  \"rules\": {
+                     \"templates\": {
+                          \"createMissing\": true,
+                          \"updateExisting\": true
+                      },
+                      \"items\": {
+                          \"createMissing\": true,
+                          \"updateExisting\": true,
+                          \"deleteMissing\": true
+                      },
+                      \"triggers\": {
+                          \"createMissing\": true,
+                          \"updateExisting\": true,
+                          \"deleteMissing\": true
+                      },
+                      \"valueMaps\": {
+                          \"createMissing\": true,
+                          \"updateExisting\": false
+                      }
+                  },
+                  \"source\": \"`cat /usr/share/doc/ubnt-zabbix-template/$1`\"
+              },
+              \"id\": 1
+          }"
+
+    curl -X POST http://127.0.0.1/zabbix/api_jsonrpc.php \
+         -H 'Content-Type: application/json-rpc' \
+         -d "$json"
+}
+
+rm -f /etc/nginx/sites-enabled/default
+rm -rf /var/lib/postgresql/12/main/*
+rm -f /etc/systemd/system/multi-user.target.wants/zabbix-server.service
+awk -F":" '{if ($1=="postgres") system("chown -R " $3":"$4 " /var/lib/postgresql/12/main/") }' /etc/passwd
+ln -s /lib/systemd/system/zabbix-server.service /etc/systemd/system/multi-user.target.wants/zabbix-server.service
+cp -r /tmp/etc/ /
+cp -r /tmp/lib/systemd /lib/
+cp -r /tmp/usr/ /
+cp -r /tmp/var/ /
+find /var/lib/postgresql/12/main/ -type d | xargs chmod 755
+find /var/lib/postgresql/12/main/ -type f | xargs chmod 644
+chmod 700 /var/lib/postgresql/12/main
+chown -R postgres:postgres /var/lib/postgresql/
+pg_ctlcluster 12 main start
+
+sensors-detect --auto
+
+cfg_import "Zabbix_6.0-6.4.xml"
+cfg_import "export_zabbix_server.xml"
+cfg_import "zbx_export_internal_netping.xml"
+cp /usr/share/doc/ubnt-zabbix-template/sendsms2.sh /usr/lib/zabbix/alertscripts/
+cfg_import "mediatype_sms_via_np.xml"
+
+systemctl restart zabbix-server
+
+
+exit 0
