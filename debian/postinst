@@ -1,64 +1,38 @@
 #! /bin/bash
 #
 
-function cfg_import() {
-    json="{
-              \"jsonrpc\": \"2.0\",
-              \"method\": \"configuration.import\",
-              \"params\": {
-                  \"format\": \"xml\",
-                  \"rules\": {
-                     \"templates\": {
-                          \"createMissing\": true,
-                          \"updateExisting\": true
-                      },
-                      \"items\": {
-                          \"createMissing\": true,
-                          \"updateExisting\": true,
-                          \"deleteMissing\": true
-                      },
-                      \"triggers\": {
-                          \"createMissing\": true,
-                          \"updateExisting\": true,
-                          \"deleteMissing\": true
-                      },
-                      \"valueMaps\": {
-                          \"createMissing\": true,
-                          \"updateExisting\": false
-                      }
-                  },
-                  \"source\": \"`cat /usr/share/doc/ubnt-zabbix-template/$1`\"
-              },
-              \"id\": 1
-          }"
-
-    curl -X POST http://127.0.0.1/zabbix/api_jsonrpc.php \
-         -H 'Content-Type: application/json-rpc' \
-         -d "$json"
-}
+api_url="http://127.0.0.1/api_jsonrpc.php"
+zbx_imp="python3 /usr/share/doc/ubnt-zabbix-template/import.py"
+api_cfg_import="$zbx_imp --url $api_url --user visor --password ping"
 
 rm -f /etc/nginx/sites-enabled/default
-rm -rf /var/lib/postgresql/12/main/*
 rm -f /etc/systemd/system/multi-user.target.wants/zabbix-server.service
-awk -F":" '{if ($1=="postgres") system("chown -R " $3":"$4 " /var/lib/postgresql/12/main/") }' /etc/passwd
+awk -F":" '{if ($1=="postgres") system("chown -R " $3":"$4 " /var/lib/postgresql/16/main/") }' /etc/passwd
 ln -s /lib/systemd/system/zabbix-server.service /etc/systemd/system/multi-user.target.wants/zabbix-server.service
-cp -r /tmp/etc/ /
-cp -r /tmp/lib/systemd /lib/
-cp -r /tmp/usr/ /
-cp -r /tmp/var/ /
-find /var/lib/postgresql/12/main/ -type d | xargs chmod 755
-find /var/lib/postgresql/12/main/ -type f | xargs chmod 644
-chmod 700 /var/lib/postgresql/12/main
-chown -R postgres:postgres /var/lib/postgresql/
-pg_ctlcluster 12 main start
+cp -rf /tmp/etc/ /
+cp -rf /tmp/lib/systemd /lib/
+cp -rf /tmp/usr/ /
+#chown -R postgres:postgres /var/lib/postgresql/
+#pg_dropcluster 12 main
+#sudo -u postgres dropdb zabbix
+#sudo -u postgres dropuser zabbix
+#pg_createcluster 16 main
+#chown -R postgres.postgres /run/postgresql/
+#pg_ctlcluster 16 main start
+sudo -u postgres createuser -w zabbix
+sudo -u postgres createdb -O zabbix zabbix
+echo "ALTER USER zabbix WITH PASSWORD 'netping';" | sudo -u postgres psql zabbix
+cat /usr/share/doc/ubnt-zabbix-template/dump.sql.gz | gzip -dc | sudo -u postgres psql -d zabbix
 
 sensors-detect --auto
 
-cfg_import "Zabbix_6.0-6.4.xml"
-cfg_import "export_zabbix_server.xml"
-cfg_import "zbx_export_internal_netping.xml"
+$api_cfg_import "Zabbix_6.0-6.4.xml"
+$api_cfg_import "export_zabbix_server.xml"
+$api_cfg_import "zbx_export_internal_netping.xml"
 cp /usr/share/doc/ubnt-zabbix-template/sendsms2.sh /usr/lib/zabbix/alertscripts/
-cfg_import "mediatype_sms_via_np.xml"
+$api_cfg_import "mediatype_sms_via_np.xml"
+
+rm -rf /tmp/etc /tmp/lib /tmp/usr
 
 systemctl restart zabbix-server
 
