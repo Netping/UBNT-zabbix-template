@@ -5,6 +5,7 @@ After=network.target
 After=mysql.service
 After=mysqld.service
 After=mariadb.service
+After=postgresql.service
 
 [Service]
 Environment="CONFFILE=/etc/zabbix/zabbix_server.conf"

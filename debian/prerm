@@ -2,8 +2,16 @@
 #
 
 rm -rf /usr/lib/zabbix/alertscripts/sendsms2.sh
-sudo -u postgres dropdb zabbix
-sudo -u postgres dropuser zabbix
 rm -rf /usr/share/doc/ubnt-zabbix-template
+sleep 3
+
+test=`ps ax | grep zabbix_server | grep -v 'grep zabbix_server'`
+
+if [ -z "$test" ]; then
+    echo "zabbix not running"
+    exit 0
+fi
+
+/etc/init.d/zabbix-server restart
 
 exit 0

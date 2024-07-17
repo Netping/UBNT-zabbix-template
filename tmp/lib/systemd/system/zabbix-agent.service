@@ -2,6 +2,7 @@
 Description=Zabbix Agent
 After=syslog.target
 After=network.target
+After=postgresql.target
 
 [Service]
 Environment="CONFFILE=/etc/zabbix/zabbix_agentd.conf"

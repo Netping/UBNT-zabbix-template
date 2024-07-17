@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>6.0</version>
-    <date>2024-02-26T01:22:12Z</date>
-    <groups>
-        <group>
+    <version>6.4</version>
+    <host_groups>
+        <host_group>
             <uuid>799e5bc224ed4752a0d903b29bc75c53</uuid>
             <name>NetPing</name>
-        </group>
-    </groups>
+        </host_group>
+    </host_groups>
     <hosts>
         <host>
             <host>Internal_NetPing</host>
@@ -21,7 +20,7 @@
             <interfaces>
                 <interface>
                     <type>SNMP</type>
-                    <ip>192.168.88.101</ip>
+                    <ip>192.168.168.100</ip>
                     <port>161</port>
                     <details>
                         <version>SNMPV1</version>
@@ -32,10 +31,10 @@
             </interfaces>
             <items>
                 <item>
-                    <name>GSM Registratios</name>
+                    <name>GSM Status</name>
                     <type>SNMP_AGENT</type>
-                    <snmp_oid>.1.3.6.1.4.1.25728.3800.1.2</snmp_oid>
-                    <key>GSMReg</key>
+                    <snmp_oid>.1.3.6.1.4.1.25728.3800.1.1.0</snmp_oid>
+                    <key>npGsmFailed</key>
                     <interface_ref>if1</interface_ref>
                     <tags>
                         <tag>
@@ -45,10 +44,10 @@
                     </tags>
                 </item>
                 <item>
-                    <name>GSM Status</name>
+                    <name>GSM Registratios</name>
                     <type>SNMP_AGENT</type>
-                    <snmp_oid>.1.3.6.1.4.1.25728.3800.1.1</snmp_oid>
-                    <key>GSMStatus</key>
+                    <snmp_oid>.1.3.6.1.4.1.25728.3800.1.2.0</snmp_oid>
+                    <key>npGsmRegistration</key>
                     <interface_ref>if1</interface_ref>
                     <tags>
                         <tag>
@@ -60,8 +59,8 @@
                 <item>
                     <name>GSM Strength</name>
                     <type>SNMP_AGENT</type>
-                    <snmp_oid>.1.3.6.1.4.1.25728.3800.1.3</snmp_oid>
-                    <key>GSMStr</key>
+                    <snmp_oid>.1.3.6.1.4.1.25728.3800.1.3.0</snmp_oid>
+                    <key>npGsmStrength</key>
                     <preprocessing>
                         <step>
                             <type>IN_RANGE</type>
@@ -95,6 +94,15 @@ else {return 0}</parameter>
                     <type>SNMP_AGENT</type>
                     <snmp_oid>discovery[{#H_MEMO}, .1.3.6.1.4.1.25728.8400.1.1.6]</snmp_oid>
                     <key>HumiditySensorsHSDiscovery</key>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#H_MEMO}</macro>
+                                <value>\S+</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
                     <interface_ref>if1</interface_ref>
                     <item_prototypes>
                         <item_prototype>
@@ -209,6 +217,68 @@ else {return 0}</parameter>
                             </tags>
                         </item_prototype>
                     </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>Humidity Sensor {#SNMPINDEX} (%) ({#H_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <drawtype>DASHED_LINE</drawtype>
+                                    <color>FF4000</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npRelHumSafeRangeHigh[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <drawtype>DASHED_LINE</drawtype>
+                                    <color>0040FF</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npRelHumSafeRangeLow[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>FFBF00</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npRelHumValue[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>Humidity Sensor {#SNMPINDEX} (°C) ({#H_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>FFBF00</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npRelHumTempValue[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <drawtype>DASHED_LINE</drawtype>
+                                    <color>FF4000</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npRelHumTempSafeRangeHigh[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <drawtype>DASHED_LINE</drawtype>
+                                    <color>0040FF</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npRelHumTempSafeRangeLow[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
                 </discovery_rule>
                 <discovery_rule>
                     <name>Internal IO</name>
@@ -216,6 +286,15 @@ else {return 0}</parameter>
                     <snmp_oid>discovery[{#IO_MEMO}, .1.3.6.1.4.1.25728.8900.1.1.6]</snmp_oid>
                     <key>InternalIOSensorsDiscovery</key>
                     <delay>10s</delay>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#IO_MEMO}</macro>
+                                <value>\S+</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
                     <description>Internal IO lines from Discovery</description>
                     <interface_ref>if1</interface_ref>
                     <item_prototypes>
@@ -289,6 +368,15 @@ else {return 0}</parameter>
                     <type>SNMP_AGENT</type>
                     <snmp_oid>discovery[{#V_MEMO}, .1.3.6.1.4.1.25728.9000.1.1.6]</snmp_oid>
                     <key>pwrq</key>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#V_MEMO}</macro>
+                                <value>\S+</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
                     <interface_ref>if1</interface_ref>
                     <item_prototypes>
                         <item_prototype>
@@ -508,13 +596,80 @@ else {return 0}</parameter>
                     <type>SNMP_AGENT</type>
                     <snmp_oid>discovery[{#R_MEMO}, .1.3.6.1.4.1.25728.5500.5.1.6]</snmp_oid>
                     <key>RelayDiscovery</key>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#R_MEMO}</macro>
+                                <value>\S+</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
                     <interface_ref>if1</interface_ref>
                     <item_prototypes>
+                        <item_prototype>
+                            <name>Relay {#SNMPINDEX} Current ({#R_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.5500.5.1.8.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelayCurrent[{#SNMPINDEX}]</key>
+                            <units>A</units>
+                            <interface_ref>if1</interface_ref>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Relay</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Relay {#SNMPINDEX} Energy ({#R_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.5500.5.1.10.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelayEnergy[{#SNMPINDEX}]</key>
+                            <units>Wh</units>
+                            <interface_ref>if1</interface_ref>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Relay</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
                         <item_prototype>
                             <name>Relay {#SNMPINDEX} Mode ({#R_MEMO})</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.25728.5500.5.1.2.{#SNMPINDEX}</snmp_oid>
                             <key>npRelayMode[{#SNMPINDEX}]</key>
+                            <interface_ref>if1</interface_ref>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Relay</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Relay {#SNMPINDEX} Powered ({#R_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.5500.5.1.16.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelayPowered[{#SNMPINDEX}]</key>
+                            <description>Presence of alternating current at the output (relay operation test)
+0 - no alternating current at the output socket
+1 - AC current present at the output socket</description>
+                            <interface_ref>if1</interface_ref>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Relay</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Relay {#SNMPINDEX} Power ({#R_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.5500.5.1.9.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelayPower[{#SNMPINDEX}]</key>
+                            <units>VA</units>
                             <interface_ref>if1</interface_ref>
                             <tags>
                                 <tag>
@@ -548,8 +703,74 @@ else {return 0}</parameter>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
+                        <item_prototype>
+                            <name>Relay {#SNMPINDEX} Voltage ({#R_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.5500.5.1.7.{#SNMPINDEX}</snmp_oid>
+                            <key>npRelayVoltage[{#SNMPINDEX}]</key>
+                            <units>V</units>
+                            <interface_ref>if1</interface_ref>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Relay</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
                     </item_prototypes>
                     <graph_prototypes>
+                        <graph_prototype>
+                            <name>Relay {#SNMPINDEX} Current ({#R_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>1A7C11</color>
+                                    <calc_fnc>ALL</calc_fnc>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npRelayCurrent[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>Relay {#SNMPINDEX} Energy ({#R_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>1A7C11</color>
+                                    <calc_fnc>ALL</calc_fnc>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npRelayEnergy[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>Relay {#SNMPINDEX} Power ({#R_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>1A7C11</color>
+                                    <calc_fnc>ALL</calc_fnc>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npRelayPower[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>Relay {#SNMPINDEX} Powered ({#R_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>1A7C11</color>
+                                    <calc_fnc>ALL</calc_fnc>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npRelayPowered[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
                         <graph_prototype>
                             <name>Relay {#SNMPINDEX} State ({#R_MEMO})</name>
                             <graph_items>
@@ -563,6 +784,19 @@ else {return 0}</parameter>
                                 </graph_item>
                             </graph_items>
                         </graph_prototype>
+                        <graph_prototype>
+                            <name>Relay {#SNMPINDEX} Voltage ({#R_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>1A7C11</color>
+                                    <calc_fnc>ALL</calc_fnc>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npRelayVoltage[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
                     </graph_prototypes>
                 </discovery_rule>
                 <discovery_rule>
@@ -570,6 +804,15 @@ else {return 0}</parameter>
                     <type>SNMP_AGENT</type>
                     <snmp_oid>discovery[{#T_MEMO}, .1.3.6.1.4.1.25728.8800.1.1.6]</snmp_oid>
                     <key>TemperatureSensorsDiscovery</key>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#T_MEMO}</macro>
+                                <value>\S+</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
                     <interface_ref>if1</interface_ref>
                     <item_prototypes>
                         <item_prototype>

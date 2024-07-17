@@ -2,13 +2,12 @@ Source: ubnt-zabbix-template
 Section: misc
 Priority: optional
 Maintainer: _valerius@mail.ru
+Version: 2.1-1
 
 Package: ubnt-zabbix-template
 Architecture: all
 Build-Depends: debhelper-compat
-Depends: jq, lm-sensors, curl, zabbix-server-pgsql, zabbix-frontend-php,
-   php7.4-pgsql, zabbix-nginx-conf, zabbix-sql-scripts, zabbix-agent,
-   postgresql, postgresql-client, iptables-persistent
+Depends: jq, lm-sensors, curl, iptables-persistent
 Description: NetPing
  First deb build.
  Try number one.

@@ -6,7 +6,7 @@
         <media_type>
             <name>Send SMS (via Internal NetPing)</name>
             <type>SCRIPT</type>
-            <script_name>sendsms.sh</script_name>
+            <script_name>sendsms2.sh</script_name>
             <parameters>
                 <parameter>{ALERT.SENDTO}</parameter>
                 <parameter>{ALERT.MESSAGE}</parameter>
