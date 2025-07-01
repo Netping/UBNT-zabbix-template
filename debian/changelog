@@ -1,5 +1,6 @@
-ubnt-zabbix-template (2.1-1) unstable; urgency=low
+ubnt-zabbix-template (2.2-1) unstable; urgency=medium
 
-  * Bla bla sux.
+  * Update Netping universal zabbix template. (#43414105)
+  * Fix Netping Internal zabbix template. (#42975974)
 
- -- Valery V. Sedletski <_valerius@mail.ru>  Tue, 26 Feb 2024 06:19:00 -0300
+ -- Netping DKSL team <soft@netping.tw>  Tue, 01 Jul 2025 13:38:00 -0400
