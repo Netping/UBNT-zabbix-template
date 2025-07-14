@@ -1,4 +1,4 @@
-ubnt-zabbix-template (2.2-1) unstable; urgency=medium
+ubnt-zabbix-template (2.2-2) unstable; urgency=medium
 
   * Update Netping universal zabbix template. (#43414105)
   * Fix Netping Internal zabbix template. (#42975974)
