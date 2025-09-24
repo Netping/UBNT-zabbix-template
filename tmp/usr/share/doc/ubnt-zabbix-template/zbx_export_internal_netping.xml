@@ -61,6 +61,7 @@
                     <type>SNMP_AGENT</type>
                     <snmp_oid>.1.3.6.1.4.1.25728.3800.1.3.0</snmp_oid>
                     <key>npGsmStrength</key>
+                    <units>%</units>
                     <preprocessing>
                         <step>
                             <type>IN_RANGE</type>
@@ -87,32 +88,252 @@ else {return 0}</parameter>
                         </tag>
                     </tags>
                 </item>
-                <item>
-                    <name>Total current on Relays</name>
-                    <type>CALCULATED</type>
-                    <key>npRelaysTotalCurrent</key>
-                    <value_type>FLOAT</value_type>
-                    <units>A</units>
-                    <params>sum(last_foreach(//npRelayCurrent[*]))</params>
-                </item>
-                <item>
-                    <name>Total energy on Relays</name>
-                    <type>CALCULATED</type>
-                    <key>npRelaysTotalEnergy</key>
-                    <value_type>FLOAT</value_type>
-                    <units>kWh</units>
-                    <params>sum(last_foreach(//npRelayEnergy[*]))</params>
-                </item>
-                <item>
-                    <name>Total power on Repays</name>
-                    <type>CALCULATED</type>
-                    <key>npRelaysTotalPower</key>
-                    <value_type>FLOAT</value_type>
-                    <units>W</units>
-                    <params>sum(last_foreach(//npRelayPower[*]))</params>
-                </item>
             </items>
             <discovery_rules>
+                <discovery_rule>
+                    <name>Analog Input Discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#AI_MEMO}, .1.3.6.1.4.1.25728.8200.1.1.6]</snmp_oid>
+                    <key>AnalogInputDiscovery</key>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#AI_MEMO}</macro>
+                                <value>\S+</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <description>Analog Input Discovery</description>
+                    <interface_ref>if1</interface_ref>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Analog Input {#SNMPINDEX} Power ({#AI_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8200.1.1.7.{#SNMPINDEX}</snmp_oid>
+                            <key>npInputAnalogPower[{#SNMPINDEX}]</key>
+                            <description>Controls power on Current Loop Adapter outputs +24V, +12V</description>
+                            <interface_ref>if1</interface_ref>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>last(/Internal_NetPing/npInputAnalogPower[{#SNMPINDEX}])=0</expression>
+                                    <name>{HOST.NAME} - Analog Input {#SNMPINDEX} Power Off ({#AI_MEMO})</name>
+                                    <priority>WARNING</priority>
+                                    <description>Current Loop Adapter is Power Off</description>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Analog Input {#SNMPINDEX} Current ({#AI_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8200.1.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>npOwInputAnalogCurrent[{#SNMPINDEX}]</key>
+                            <value_type>FLOAT</value_type>
+                            <units>mA</units>
+                            <description>Current via RS_P, RS_N contacts of Current Loop Adapter, mA</description>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <parameters>
+                                        <parameter>0.001</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Analog Input {#SNMPINDEX} Resistance ({#AI_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8200.1.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>npOwInputAnalogResistance[{#SNMPINDEX}]</key>
+                            <units>Ohm</units>
+                            <description>Resistance of the Current Loop, Ohm</description>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Analog Input {#SNMPINDEX} Safe Range High ({#AI_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8200.1.1.12.{#SNMPINDEX}</snmp_oid>
+                            <key>npOwInputAnalogSafeRangeHigh[{#SNMPINDEX}]</key>
+                            <delay>23h</delay>
+                            <description>Top marging of Safe Range, mA or V or Ohm. If not specified, value is -32768</description>
+                            <preprocessing>
+                                <step>
+                                    <type>IN_RANGE</type>
+                                    <parameters>
+                                        <parameter>0</parameter>
+                                        <parameter>32768</parameter>
+                                    </parameters>
+                                    <error_handler>CUSTOM_ERROR</error_handler>
+                                    <error_handler_params>Not specified</error_handler_params>
+                                </step>
+                            </preprocessing>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Analog Input {#SNMPINDEX} Safe Range Low ({#AI_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8200.1.1.13.{#SNMPINDEX}</snmp_oid>
+                            <key>npOwInputAnalogSafeRangeLow[{#SNMPINDEX}]</key>
+                            <delay>23h</delay>
+                            <description>Bottom marging of Safe Range, mA or V or Ohm. If not specified, value is -32768</description>
+                            <preprocessing>
+                                <step>
+                                    <type>IN_RANGE</type>
+                                    <parameters>
+                                        <parameter>0</parameter>
+                                        <parameter>32768</parameter>
+                                    </parameters>
+                                    <error_handler>CUSTOM_ERROR</error_handler>
+                                    <error_handler_params>Not specified</error_handler_params>
+                                </step>
+                            </preprocessing>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Analog Input {#SNMPINDEX} Status ({#AI_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8200.1.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>npOwInputAnalogStatus[{#SNMPINDEX}]</key>
+                            <description>Status of Current Loop Signal, failure 1w = no reply from the adapter on 1wire bus, failureAnalog = signal is beyond it's Working Range, belowSafe, safe, aboveSafe - status of the signal relative to the Safe Range margins</description>
+                            <interface_ref>if1</interface_ref>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>last(/Internal_NetPing/npOwInputAnalogStatus[{#SNMPINDEX}])=3</expression>
+                                    <name>{HOST.NAME} - Analog Input {#SNMPINDEX} ({#AI_MEMO}) Status: above safe range</name>
+                                    <priority>HIGH</priority>
+                                    <description>Analog input value above the safe range</description>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>last(/Internal_NetPing/npOwInputAnalogStatus[{#SNMPINDEX}])=1</expression>
+                                    <name>{HOST.NAME} - Analog Input {#SNMPINDEX} ({#AI_MEMO}) Status: below safe range</name>
+                                    <priority>HIGH</priority>
+                                    <description>Analog input value below the safe range</description>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>last(/Internal_NetPing/npOwInputAnalogStatus[{#SNMPINDEX}])=0</expression>
+                                    <name>{HOST.NAME} - Analog Input {#SNMPINDEX} ({#AI_MEMO}) Status: SENSOR NOT FOUND</name>
+                                    <priority>WARNING</priority>
+                                    <description>No reply from the adapter on 1wire bus</description>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>last(/Internal_NetPing/npOwInputAnalogStatus[{#SNMPINDEX}])=5</expression>
+                                    <name>{HOST.NAME} - Analog Input {#SNMPINDEX} ({#AI_MEMO}) Status: signal is beyond it's Working Range</name>
+                                    <priority>WARNING</priority>
+                                    <description>Analog signal is beyond it's working range</description>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Analog Input {#SNMPINDEX} Voltage ({#AI_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8200.1.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>npOwInputAnalogVoltage[{#SNMPINDEX}]</key>
+                            <value_type>FLOAT</value_type>
+                            <units>V</units>
+                            <description>Voltage on RS_P contact of Current Loop Adapter Vs Ground, V</description>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <parameters>
+                                        <parameter>0.001</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Analog Input {#SNMPINDEX} Work Range High ({#AI_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8200.1.1.11.{#SNMPINDEX}</snmp_oid>
+                            <key>npOwInputAnalogWorkRangeHigh[{#SNMPINDEX}]</key>
+                            <delay>23h</delay>
+                            <description>Top marging of Working Range, mA or V or Ohm. If monitored value is outide of Working Range, Analog Failure take place. If not specified, value is -32768</description>
+                            <preprocessing>
+                                <step>
+                                    <type>IN_RANGE</type>
+                                    <parameters>
+                                        <parameter>0</parameter>
+                                        <parameter>32768</parameter>
+                                    </parameters>
+                                    <error_handler>CUSTOM_ERROR</error_handler>
+                                    <error_handler_params>Not specified</error_handler_params>
+                                </step>
+                            </preprocessing>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Analog Input {#SNMPINDEX} Work Range Low ({#AI_MEMO})</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.4.1.25728.8200.1.1.14.{#SNMPINDEX}</snmp_oid>
+                            <key>npOwInputAnalogWorkRangeLow[{#SNMPINDEX}]</key>
+                            <delay>23h</delay>
+                            <description>Bottom marging of Working Range, mA or V or Ohm. If monitored value is outide of Working Range, Analog Failure take place. If not specified, value is -32768</description>
+                            <preprocessing>
+                                <step>
+                                    <type>IN_RANGE</type>
+                                    <parameters>
+                                        <parameter>0</parameter>
+                                        <parameter>32768</parameter>
+                                    </parameters>
+                                    <error_handler>CUSTOM_ERROR</error_handler>
+                                    <error_handler_params>Not specified</error_handler_params>
+                                </step>
+                            </preprocessing>
+                            <interface_ref>if1</interface_ref>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>Analog Input {#SNMPINDEX} Current (mA) ({#AI_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npOwInputAnalogCurrent[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>Analog Input {#SNMPINDEX} Resistance (Ohm) ({#AI_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npOwInputAnalogResistance[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>Analog Input {#SNMPINDEX} Status ({#AI_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npOwInputAnalogStatus[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>Analog Input {#SNMPINDEX} Voltage (V) ({#AI_MEMO})</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Internal_NetPing</host>
+                                        <key>npOwInputAnalogVoltage[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
                 <discovery_rule>
                     <name>Humidity Sensors Discovery</name>
                     <type>SNMP_AGENT</type>
@@ -171,12 +392,33 @@ else {return 0}</parameter>
                                     <value>Humidity</value>
                                 </tag>
                             </tags>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>last(/Internal_NetPing/npRelHumStatus[{#SNMPINDEX}])=3</expression>
+                                    <name>{HOST.NAME} - Humidity Sensor {#SNMPINDEX} ({#H_MEMO}) Status: HUMIDITY ABOVE SAFE RANGE</name>
+                                    <priority>HIGH</priority>
+                                    <description>Относительная влажность выше нормы</description>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>last(/Internal_NetPing/npRelHumStatus[{#SNMPINDEX}])=1</expression>
+                                    <name>{HOST.NAME} - Humidity Sensor {#SNMPINDEX} ({#H_MEMO}) Status: HUMIDITY BELOW SAFE RANGE</name>
+                                    <priority>HIGH</priority>
+                                    <description>Относительная влажность ниже нормы</description>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>last(/Internal_NetPing/npRelHumStatus[{#SNMPINDEX}])=0</expression>
+                                    <name>{HOST.NAME} - Humidity Sensor {#SNMPINDEX} ({#H_MEMO}) Status: HUMIDITY SENSOR NOT FOUND</name>
+                                    <priority>WARNING</priority>
+                                    <description>Датчик влажности не найден</description>
+                                </trigger_prototype>
+                            </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
                             <name>Humidity Sensor {#SNMPINDEX} Temp High ({#H_MEMO})</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.25728.8400.1.1.9.{#SNMPINDEX}</snmp_oid>
                             <key>npRelHumTempSafeRangeHigh[{#SNMPINDEX}]</key>
+                            <units>°C</units>
                             <interface_ref>if1</interface_ref>
                             <tags>
                                 <tag>
@@ -212,12 +454,33 @@ else {return 0}</parameter>
                                     <value>Humidity</value>
                                 </tag>
                             </tags>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>last(/Internal_NetPing/npRelHumTempStatus[{#SNMPINDEX}])=3</expression>
+                                    <name>{HOST.NAME} - Humidity Sensor {#SNMPINDEX} ({#H_MEMO}) Status: TEMPERATURE ABOVE SAFE RANGE</name>
+                                    <priority>HIGH</priority>
+                                    <description>Температура выше нормы</description>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>last(/Internal_NetPing/npRelHumTempStatus[{#SNMPINDEX}])=1</expression>
+                                    <name>{HOST.NAME} - Humidity Sensor {#SNMPINDEX} ({#H_MEMO}) Status: TEMPERATURE BELOW SAFE RANGE</name>
+                                    <priority>HIGH</priority>
+                                    <description>Температура ниже нормы</description>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>last(/Internal_NetPing/npRelHumTempStatus[{#SNMPINDEX}])=0</expression>
+                                    <name>{HOST.NAME} - Humidity Sensor {#SNMPINDEX} ({#H_MEMO}) Status: TEMPERATURE SENSOR NOT FOUND</name>
+                                    <priority>WARNING</priority>
+                                    <description>Датчик температуры/влажности не найден</description>
+                                </trigger_prototype>
+                            </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
                             <name>Humidity Sensor {#SNMPINDEX} Temperature ({#H_MEMO})</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.25728.8400.1.1.4.{#SNMPINDEX}</snmp_oid>
                             <key>npRelHumTempValue[{#SNMPINDEX}]</key>
+                            <units>°C</units>
                             <interface_ref>if1</interface_ref>
                             <tags>
                                 <tag>
@@ -636,19 +899,12 @@ else {return 0}</parameter>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.25728.5500.5.1.8.{#SNMPINDEX}</snmp_oid>
                             <key>npRelayCurrent[{#SNMPINDEX}]</key>
-                            <value_type>FLOAT</value_type>
                             <units>A</units>
                             <preprocessing>
                                 <step>
                                     <type>MULTIPLIER</type>
                                     <parameters>
                                         <parameter>0.001</parameter>
-                                    </parameters>
-                                </step>
-                                <step>
-                                    <type>JAVASCRIPT</type>
-                                    <parameters>
-                                        <parameter>return Math.round(value * 100) / 100;</parameter>
                                     </parameters>
                                 </step>
                             </preprocessing>
@@ -665,16 +921,8 @@ else {return 0}</parameter>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.25728.5500.5.1.10.{#SNMPINDEX}</snmp_oid>
                             <key>npRelayEnergy[{#SNMPINDEX}]</key>
-                            <value_type>FLOAT</value_type>
-                            <units>kWh</units>
-                            <preprocessing>
-                                <step>
-                                    <type>MULTIPLIER</type>
-                                    <parameters>
-                                        <parameter>0.001</parameter>
-                                    </parameters>
-                                </step>
-                            </preprocessing>
+                            <delay>460s</delay>
+                            <units>Wh</units>
                             <interface_ref>if1</interface_ref>
                             <tags>
                                 <tag>
@@ -717,19 +965,12 @@ else {return 0}</parameter>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.25728.5500.5.1.9.{#SNMPINDEX}</snmp_oid>
                             <key>npRelayPower[{#SNMPINDEX}]</key>
-                            <value_type>FLOAT</value_type>
-                            <units>W</units>
+                            <units>VA</units>
                             <preprocessing>
                                 <step>
                                     <type>MULTIPLIER</type>
                                     <parameters>
                                         <parameter>0.001</parameter>
-                                    </parameters>
-                                </step>
-                                <step>
-                                    <type>JAVASCRIPT</type>
-                                    <parameters>
-                                        <parameter>return Math.round(value * 10) / 10;</parameter>
                                     </parameters>
                                 </step>
                             </preprocessing>
@@ -771,19 +1012,12 @@ else {return 0}</parameter>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.25728.5500.5.1.7.{#SNMPINDEX}</snmp_oid>
                             <key>npRelayVoltage[{#SNMPINDEX}]</key>
-                            <value_type>FLOAT</value_type>
                             <units>V</units>
                             <preprocessing>
                                 <step>
                                     <type>MULTIPLIER</type>
                                     <parameters>
                                         <parameter>0.001</parameter>
-                                    </parameters>
-                                </step>
-                                <step>
-                                    <type>JAVASCRIPT</type>
-                                    <parameters>
-                                        <parameter>return Math.round(value * 10) / 10;</parameter>
                                     </parameters>
                                 </step>
                             </preprocessing>
@@ -940,16 +1174,19 @@ else {return 0}</parameter>
                                     <expression>last(/Internal_NetPing/npThermoStatus[{#SNMPINDEX}])=3</expression>
                                     <name>{HOST.NAME} - Temperature Sensor {#SNMPINDEX} ({#T_MEMO}) Status: ABOVE SAFE RANGE</name>
                                     <priority>HIGH</priority>
+                                    <description>Температура выше нормы</description>
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <expression>last(/Internal_NetPing/npThermoStatus[{#SNMPINDEX}])=1</expression>
                                     <name>{HOST.NAME} - Temperature Sensor {#SNMPINDEX} ({#T_MEMO}) Status: BELOW SAFE RANGE</name>
                                     <priority>HIGH</priority>
+                                    <description>Температура выше ниже нормы</description>
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <expression>last(/Internal_NetPing/npThermoStatus[{#SNMPINDEX}])=0</expression>
-                                    <name>{Template_NetPing:npThermoStatus[{#SNMPINDEX}].last()}=0</name>
-                                    <priority>DISASTER</priority>
+                                    <name>{HOST.NAME} - Temperature Sensor {#SNMPINDEX} ({#T_MEMO}) Status: NOT FOUND</name>
+                                    <priority>WARNING</priority>
+                                    <description>Температурный датчик сломан или не подключен</description>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
