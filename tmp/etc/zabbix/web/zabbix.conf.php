@@ -30,6 +30,8 @@ $ZBX_SERVER_NAME		= 'zabbix-netping';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 
+$default_language       = 'en_US';
+
 // Uncomment this block only if you are using Elasticsearch.
 // Elasticsearch url (can be string if same url is used for all types).
 //$HISTORY['url'] = [
